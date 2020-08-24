@@ -44,38 +44,50 @@
 	
 	<div class="input-group-prepend">
     	<span class="input-group-text">Polinomial</span>
-    	<input type = "text" name = "poly" placeholder="Polinomial" required class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm">
+    	<input type = "text" name = "poly" placeholder="Example: s**2 + 2*s + 1" required class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm">
    		<small id="polinomialHelp" class="form-text text-muted">Write a polynomial</small>
   	</div>
 
   	<div class="input-group-prepend">
-  		<span class="input-group-text">Symbol of the polinomial</span>
-  		<input type = "text" name = "var" placeholder="Var Symbol" required required class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm">
+  		<span class="input-group-text">Variable symbol</span>
+  		<input type = "text" name = "var" placeholder="s" required required class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" value="s">
   	</div>
 
   	<div class="input-group-prepend">
   		<span class="input-group-text">Gain Symbol</span>
-		<input type = "text" name = "gain" placeholder="Gain Symbol" required class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm">
+		<input type = "text" name = "gain" placeholder="k" required class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" value="k">
 	</div>
 	
 	<div class="input-group-prepend">
 		<span class="input-group-text">Epsilon Symbol</span>
-		<input type = "text" name = "epsilon" placeholder="epsilon Symbol" required class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm">
+		<input type = "text" name = "epsilon" placeholder="ε" required class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" value="ε">
 	</div>
-    
-    
-  </div>
-	
-	
 	
 
+
+	<div id="container">
+
+		<div id="left">
+			<input type="checkbox" id="Calculate limits" name="Calculate limits" checked>
+			<label for="Calculate limits" > Calculate limits </label>
+		<br> </div>
+
+		<div id="center">
+			<input type="checkbox" id="Find gain limits" name="Find gain limits" checked>
+			<label for="Find gain limits"> Find gain limits</label><br>
+		</div>
+
+	</div>
+
+	</div>
+	
+<div id="container">
 	<button type="submit" class="btn btn-sm btn-outline-primary">
 		submit
 	</button>
 
 </form>
 
-</center>
 </div>
 
 <center>
@@ -120,6 +132,15 @@
 		</tbody>
 		
 	</table>
+	<div id="Notes " class="card">
+		<h5>Notes</h5>
+		{%for msg in Notes%}
+		<p>
+		{{msg}}
+		</p>
+		{%endfor%}
+	</div>
+
 </div>
 
 
@@ -128,10 +149,35 @@
 	<div class="card-header">
 	<h3>Gain Limits</h3>
 	</div>
-	
+	<h5>Symbolic Result</h5>
 	<p>
 		\[{{gain_limits}}\]
 	</p>
+	<h5>Numerical Result</h5>
+	<p>
+		\[{{gain_limits_num}}\]
+	</p>
+</div>
+
+
+
+
+
+<div id = "About">
+	<h3>About</h3>
+	This script uses Sympy for all the symbolic calculations. if you want to know more about the the Routh Hurtwiz criteria you can visit the following <a href="https://es.wikipedia.org/wiki/Teorema_de_Routh-Hurwitz">wikipedia article.</a>.
+
+	The code is avilable in the github repository  <a href="https://github.com/eduardo98m/Routh-Hurwitz-Stability-Criterion-Calculator"> github repository.</a>.
+
+
+
+	
+</div>
+
+<div id = "More Info">
+	
+	Eduardo López 2020. This work is licensed under the MIT License.
+	
 </div>
 
 

@@ -4,6 +4,7 @@ from functions import Routh_Stability, SolveInequalities, eval_Epsilon
 
 from sympy.parsing.sympy_parser import parse_expr
 from sympy import symbols, poly, latex, simplify, expand, factor, N, collect
+from copy import deepcopy
 
 app = Flask(__name__)
 
@@ -21,90 +22,132 @@ def add_poly():
 	
 	if request.method == 'POST':
 
-		# Web
-
-		polynomia = request.form["poly"]
-		var = request.form["var"]
-		if var:
-			var = symbols(var)
-		else:
-			var =  symbols("s")
-
-		gain = request.form["gain"]
-		
-		if gain:
-			gain = symbols(gain)
-		else:
-			gain =  symbols("k")
-
-		epsilon = request.form["epsilon"]
-		
-		if epsilon:
-			epsilon = symbols(epsilon)
-		else:
-			epsilon =  symbols("ε")
-		
-
-		
-
-
-		# Operations
-
-		Polynomial = poly(parse_expr(polynomia), var)
-
-		P = Polynomial.all_coeffs()
-
-
-		degree = len(P) 
-
-		Polynomial_Latex = latex( collect(parse_expr(polynomia), var), order = 'lex' )
-
-		print(Polynomial)
-		#help(Polynomial)
-
-		P.reverse()
-
-
-		if epsilon:
-			R_array = eval_Epsilon(Routh_Stability(P, limit_var = epsilon, print_array = False), epsilon)
-		else:
-			R_array = Routh_Stability(P, print_array = False)
-
-
 		try:
 
-			gain_limits = str(gain) + "\in" + latex(SolveInequalities(R_array, gain))
+			# Web
 
-		except:
+			polynomia = request.form["poly"]
+			
+			var = request.form["var"]
+			
+			if var:
+				var = symbols(var)
+			else:
+				var =  symbols("s")
 
-			try:
+			gain = request.form["gain"]
+			
+			if gain:
+				gain = symbols(gain)
+			else:
+				gain =  symbols("k")
 
-				gain_limits = str(gain) + "\in" + latex(SolveInequalities(R_array, gain, solve_type = 'solve_sets'))
+			epsilon = request.form["epsilon"]
+			
+			if epsilon:
+				epsilon = symbols(epsilon)
+			else:
+				epsilon =  symbols("ε")
+
+			
+			
+			calc_lim  = bool(len(request.form.getlist("Calculate limits")))#fields.Boolean(request.form["Calculate limits"])
+			calc_gain = bool(len(request.form.getlist("Find gain limits")))#fields.Boolean(request.form["Find gain limits"])
+			
+			#calc_gain = False
+			
+
+			# Operations
+
+			Polynomial = poly(parse_expr(polynomia), var)
+
+			P = Polynomial.all_coeffs()
 
 
-			except:
-				gain_limits = "No Solution found"
+			degree = len(P) 
+
+			Polynomial_Latex = latex( collect(parse_expr(polynomia), var), order = 'lex' )
+
+
+			P.reverse()
+
+
+			
+			R_array, Notes = Routh_Stability(P, limit_var = epsilon, print_array = False)
+
+			
+			
+			
+
+			gain_limits_num = "None"
+			gain_limits = "None"
+
+			if calc_gain:
+
+				R_array_gain = R_array
+
+				try:
+
+					gain_limits_result = SolveInequalities(SolveInequalities(R_array_gain, gain))
+
+					gain_limits = str(gain) + "\in" + latex(gain_limits_result)
+
+					
+
+					try:
+						
+
+						gain_limits_num = str(gain) + "\in" + latex(N(gain_limits_result))
+					except:
+						
+						gain_limits_num = gain_limits
+
+
+				except :
+
+					try:
+						gain_limits_result =  SolveInequalities(R_array_gain, gain, solve_type = 'solve_sets')
+
+						gain_limits = str(gain) + "\in" + latex(gain_limits_result)
+
+						try:
+
+							gain_limits_num = str(gain) + "\in" + latex(N(gain_limits_result))
+						except:
+							gain_limits_num = gain_limits
+
+
+					except Exception as e:
+						print(e)
+						gain_limits = "No Solution found"
+						gain_limits_num =  "None"
+
+
+			if calc_lim:
+				R_array = eval_Epsilon(R_array, epsilon)
 
 
 
-		# Array elements are converted to strings
+			# Array elements are converted to strings
 
-		n = len(R_array)
-		routh_array_LaTeX = []
-		for i in range(n):
-			row = R_array[i]
-			routh_array_LaTeX.append( [str(var) + "^{" + str(n - 1 - i) + '}:'] + [latex(elem) for elem in row ])
-
-
-
-		#flash(R_array)
+			n = len(R_array)
+			routh_array_LaTeX = []
+			for i in range(n):
+				row = R_array[i]
+				routh_array_LaTeX.append( [str(var) + "^{" + str(n - 1 - i) + '}:'] + [latex(elem) for elem in row ])
 
 
+			
 
 
+			
+			return render_template('index.html', Array = routh_array_LaTeX, gain_limits = gain_limits, Polynomial = Polynomial_Latex, Notes = Notes, gain_limits_num = gain_limits_num) #redirect(url_for('index'))
 
+		
+		except Exception as e:
 
-		return render_template('index.html', Array = routh_array_LaTeX, gain_limits = gain_limits, Polynomial = Polynomial_Latex) #redirect(url_for('index'))
+			return render_template('index.html',  Notes = ["Unable to parse expression", "Error : " + str(e)])
+		
 
 	else:
 

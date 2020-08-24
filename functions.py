@@ -23,11 +23,8 @@ def Routh_Stability(P, limit_var = symbols("ε"), print_array = True):
 	Output:
 
 
-
-
-
-
 	"""
+	Notes = [] # List of 
 
 	n = len(P) # Compute the polynomia degree +1
 	A = [[0]]*n # Create the array
@@ -69,12 +66,10 @@ def Routh_Stability(P, limit_var = symbols("ε"), print_array = True):
 
 			A[i] = special_derivative(P_new)
 
-			print("Derivation in: s^"+ str(n-i-1))
-			print("Because full zero row")
+			Notes.append("Performed derivation in: \(  s^"+ str(n-i-1) + "  \)  because of full zero row" )
 
 		if A[i][0] == 0: # if one of the elements in the left column is zero
-			print("Zero in s^"+ str(n-i-1))
-			print("Substituted by" + str(limit_var) )
+			Notes.append("Zero in: \( s^"+ str(n-i-1) + " \) row in the left column substituted by \(" + str(limit_var) + "\)")
 			A[i][0] = limit_var
 
 		A[i] = A[i] + [0] * (len(A[i-1]) - len(A[i]))
@@ -84,7 +79,7 @@ def Routh_Stability(P, limit_var = symbols("ε"), print_array = True):
 
 	if print_array:
 		print_Array(A)
-	return A
+	return A, Notes
 
 
 def print_Array(A):
